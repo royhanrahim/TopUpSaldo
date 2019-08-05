@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Text, View, StyleSheet, ActivityIndicator, Dimensions, Platform, TouchableOpacity, FlatList, RefreshControl, Alert, Modal, TextInput } from 'react-native'
-import { Fab, Icon, Button } from 'native-base'
+import { Fab, Button } from 'native-base'
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import { connect } from 'react-redux'
 
 import {
@@ -207,11 +208,19 @@ class DetailBalance extends Component {
         </TouchableOpacity>
         {moreButton == item.id ?
           <View style={{ flexDirection: 'row', marginBottom: 5 }}>
-            <TouchableOpacity style={{ backgroundColor: '#a0a0a3', flex: 1, paddingVertical: 20, alignItems: 'center', borderRadius: 3, marginRight: 5, }} onPress={() => this.editTransaction(item)}>
-              <Text style={{ fontSize: 14, color: '#FFFFFF' }}>Edit</Text>
+            <TouchableOpacity style={{ backgroundColor: '#a0a0a3', flex: 1, paddingVertical: 15, alignItems: 'center', borderRadius: 3, marginRight: 5, }} onPress={() => this.editTransaction(item)}>
+              <Icon
+                name='edit'
+                size={18}
+                color='#FFFFFF'
+              />
             </TouchableOpacity>
-            <TouchableOpacity style={{ backgroundColor: '#a0a0a3', flex: 1, paddingVertical: 20, alignItems: 'center', borderRadius: 3 }} onPress={() => this.deleteTransaction(item)}>
-              <Text style={{ fontSize: 14, color: '#FFFFFF' }}>Delete</Text>
+            <TouchableOpacity style={{ backgroundColor: '#a0a0a3', flex: 1, paddingVertical: 15, alignItems: 'center', borderRadius: 3 }} onPress={() => this.deleteTransaction(item)}>
+              <Icon
+                name='trash'
+                size={18}
+                color='#FFFFFF'
+              />
             </TouchableOpacity>
           </View>
           : null
@@ -238,8 +247,12 @@ class DetailBalance extends Component {
         <View style={{ flex: 92 }}>
           <View style={{ backgroundColor: '#9896ff', flexDirection: 'row', justifyContent: 'space-between', height: 60 }}>
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-start' }}>
-              <TouchableOpacity style={{ backgroundColor: '#6565db', marginLeft: 10, paddingHorizontal: 5, paddingVertical: 10, borderRadius: 5 }} onPress={() => this.goBack()}>
-                <Text style={{ fontSize: 14, color: '#FFFFFF', textAlign: 'center' }}>BACK</Text>
+              <TouchableOpacity style={{ marginLeft: 10, paddingHorizontal: 15, paddingVertical: 10, borderRadius: 5 }} onPress={() => this.goBack()}>
+                <Icon
+                  name='chevron-left'
+                  size={18}
+                  color='#FFFFFF'
+                />
               </TouchableOpacity>
             </View>
             <View style={{ flex: 1.5, justifyContent: 'center', alignItems: 'center', }}>
@@ -248,8 +261,8 @@ class DetailBalance extends Component {
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-end', padding: 5 }}>
               <TouchableOpacity
                 style={{
-                  backgroundColor: '#6565db',
                   justifyContent: 'center',
+                  alignItems: 'center',
                   marginHorizontal: 5,
                   borderRadius: 5,
                   width: 60,
@@ -257,7 +270,11 @@ class DetailBalance extends Component {
                 }}
                 onPress={() => this.deleteAllTransaction(params.data, arrayTransaction)}
               >
-                <Text style={{ fontSize: 14, color: '#FFFFFF', textAlign: 'center' }}>DELETE ALL</Text>
+                <Icon
+                  name='trash'
+                  size={18}
+                  color='#FFFFFF'
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -286,32 +303,38 @@ class DetailBalance extends Component {
         </View>
 
         <View style={{ flex: 8, flexDirection: 'row' }}>
-          <View style={{ flex: 1.5, justifyContent: 'center', paddingLeft: 5 }}>
+          <View style={{ flex: 1, justifyContent: 'center', paddingLeft: 5 }}>
             <Text style={{ flex: 1, textAlignVertical: 'center', fontSize: 18, color: '#222226' }}>
               Remaining Balance :
             </Text>
-            <Text style={{ flex: 1, textAlignVertical: 'center', fontSize: 16, color: '#222226' }}>
+            <Text numberOfLines={2} style={{ flex: 1, textAlignVertical: 'center', fontSize: 16, color: '#222226' }}>
               Rp. {Utils.currencyCommas(String(params.data.balance))}
             </Text>
           </View>
 
-          <View style={{ flex: 1, padding: 5, flexDirection: 'row' }}>
-            <TouchableOpacity style={{ backgroundColor: '#9896ff', flex: 1, justifyContent: 'center', alignItems: 'center', borderRadius: 5, paddingHorizontal: 5 }} activeOpacity={0.5} onPress={() => this.modalTransfer()}>
-              <Text style={{ textAlign: 'center', color: '#FFFFFF' }}>
-                TF
-              </Text>
+          <View style={{ flex: 1, padding: 5, flexDirection: 'row', justifyContent: 'flex-end', }}>
+            <TouchableOpacity style={{ backgroundColor: '#9896ff', justifyContent: 'center', alignItems: 'center', borderRadius: 100, paddingHorizontal: 18 }} activeOpacity={0.5} onPress={() => this.modalTransfer()}>
+              <Icon
+                name='paper-plane'
+                size={18}
+                color='#FFFFFF'
+              />
             </TouchableOpacity>
 
-            <TouchableOpacity style={{ backgroundColor: '#9896ff', flex: 1, justifyContent: 'center', alignItems: 'center', borderRadius: 5, paddingHorizontal: 5, marginHorizontal: 5 }} activeOpacity={0.5} onPress={() => this.modalTransaction(false)}>
-              <Text style={{ textAlign: 'center', color: '#FFFFFF' }}>
-                (-)
-              </Text>
+            <TouchableOpacity style={{ backgroundColor: '#9896ff', justifyContent: 'center', alignItems: 'center', borderRadius: 100, paddingHorizontal: 18, marginHorizontal: 5 }} activeOpacity={0.5} onPress={() => this.modalTransaction(false)}>
+              <Icon
+                name='minus'
+                size={18}
+                color='#FFFFFF'
+              />
             </TouchableOpacity>
 
-            <TouchableOpacity style={{ backgroundColor: '#9896ff', flex: 1, justifyContent: 'center', alignItems: 'center', borderRadius: 5, paddingHorizontal: 5 }} activeOpacity={0.5} onPress={() => this.modalTransaction(true)}>
-              <Text style={{ textAlign: 'center', color: '#FFFFFF' }}>
-                (+)
-              </Text>
+            <TouchableOpacity style={{ backgroundColor: '#9896ff', justifyContent: 'center', alignItems: 'center', borderRadius: 100, paddingHorizontal: 18 }} activeOpacity={0.5} onPress={() => this.modalTransaction(true)}>
+              <Icon
+                name='plus'
+                size={18}
+                color='#FFFFFF'
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -357,9 +380,17 @@ class DetailBalance extends Component {
                 <View style={{ backgroundColor: '#dadaed', justifyContent: 'flex-end', alignItems: 'center', paddingRight: 5, flexDirection: 'row', }}>
                   <TouchableOpacity style={{ backgroundColor: '#9896ff', marginRight: 5, width: 60, height: 40, borderRadius: 5, justifyContent: 'center', alignItems: 'center' }} onPress={() => this.changeTypeEdit()}>
                     {typeEdit == false ?
-                      <Text style={{ textAlign: 'center', color: '#FFFFFF' }}>Reduced (-)</Text>
+                      <Icon
+                        name='minus'
+                        size={18}
+                        color='#FFFFFF'
+                      />
                       :
-                      <Text style={{ textAlign: 'center', color: '#FFFFFF' }}>Added (+)</Text>
+                      <Icon
+                        name='plus'
+                        size={18}
+                        color='#FFFFFF'
+                      />
                     }
                   </TouchableOpacity>
                 </View>

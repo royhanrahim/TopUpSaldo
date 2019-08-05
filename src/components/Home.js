@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Text, View, StyleSheet, ActivityIndicator, Dimensions, Platform, TouchableOpacity, FlatList, RefreshControl, Alert } from 'react-native'
-import { Fab, Icon, Button } from 'native-base'
+import { Fab, Button } from 'native-base'
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import { connect } from 'react-redux'
 
 import {
@@ -27,7 +28,16 @@ class Home extends Component {
   }
 
   deleteAllData = () => {
-    this.props.deleteAll()
+    Alert.alert(
+      "Warning", "Apakah Anda ingin menghapus semua transaksi ?",
+      [
+        {
+          text: 'Iya',
+          onPress: () => this.props.deleteAll(),
+        },
+        { text: 'Tidak', style: 'cancel', },
+      ],
+      { cancelable: false })
   }
 
   addUser = () => {
@@ -64,6 +74,7 @@ class Home extends Component {
   }
 
   listOrder = () => {
+    // this.props.navigation.navigate("ListOrder")
     Alert.alert("Warning", "Next version ...")
   }
 
@@ -85,15 +96,27 @@ class Home extends Component {
           </View>
         </TouchableOpacity>
         {moreButton == item.id ?
-          <View style={{ flexDirection: 'row', marginBottom: 5 }}>
-            <TouchableOpacity style={{ backgroundColor: '#a0a0a3', flex: 1, paddingVertical: 20, alignItems: 'center', borderRadius: 3 }} onPress={() => this.editUser(item)}>
-              <Text style={{ fontSize: 14, color: '#FFFFFF' }}>Edit</Text>
+          <View style={{ flexDirection: 'row', marginBottom: 5, }}>
+            <TouchableOpacity style={{ backgroundColor: '#a0a0a3', flex: 1, paddingVertical: 15, alignItems: 'center', borderRadius: 3 }} onPress={() => this.editUser(item)}>
+              <Icon
+                name='edit'
+                size={18}
+                color='#FFFFFF'
+              />
             </TouchableOpacity>
-            <TouchableOpacity style={{ backgroundColor: '#a0a0a3', flex: 1, paddingVertical: 20, alignItems: 'center', marginHorizontal: 5, borderRadius: 3 }} onPress={() => this.detailBalance(item)}>
-              <Text style={{ fontSize: 14, color: '#FFFFFF' }}>Balance</Text>
+            <TouchableOpacity style={{ backgroundColor: '#a0a0a3', flex: 1, paddingVertical: 15, alignItems: 'center', marginHorizontal: 5, borderRadius: 3 }} onPress={() => this.detailBalance(item)}>
+              <Icon
+                name='money-check'
+                size={18}
+                color='#FFFFFF'
+              />
             </TouchableOpacity>
-            <TouchableOpacity style={{ backgroundColor: '#a0a0a3', flex: 1, paddingVertical: 20, alignItems: 'center', borderRadius: 3 }} onPress={() => this.deleteUser(item.id)}>
-              <Text style={{ fontSize: 14, color: '#FFFFFF' }}>Delete</Text>
+            <TouchableOpacity style={{ backgroundColor: '#a0a0a3', flex: 1, paddingVertical: 15, alignItems: 'center', borderRadius: 3 }} onPress={() => this.deleteUser(item.id)}>
+              <Icon
+                name='trash'
+                size={18}
+                color='#FFFFFF'
+              />
             </TouchableOpacity>
           </View>
           : null
@@ -123,8 +146,12 @@ class Home extends Component {
               <Text style={{ fontSize: 18, color: '#FFFFFF' }}>USER</Text>
             </View>
             <View style={{ flex: 0.5, padding: 5, justifyContent: 'center', alignItems: 'flex-end' }}>
-              <TouchableOpacity style={{ backgroundColor: '#6565db', width: 60, height: 50, justifyContent: 'center', borderRadius: 5, marginHorizontal: 5 }} activeOpacity={0.5} onPress={() => this.deleteAllData()}>
-                <Text style={{ fontSize: 14, textAlign: 'center', color: '#FFFFFF' }}>DELETE ALL</Text>
+              <TouchableOpacity style={{ width: 60, height: 50, justifyContent: 'center', alignItems: 'center', borderRadius: 5, marginHorizontal: 5 }} activeOpacity={0.5} onPress={() => this.deleteAllData()}>
+                <Icon
+                  name='trash'
+                  size={18}
+                  color='#FFFFFF'
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -157,23 +184,29 @@ class Home extends Component {
           <View style={{ flex: 1.5, justifyContent: 'center', paddingLeft: 5 }}>
             <Text style={{ flex: 1, textAlignVertical: 'center', fontSize: 18, color: '#222226' }}>
               All Total Balance :
-                        </Text>
+            </Text>
             <Text style={{ flex: 1, textAlignVertical: 'center', fontSize: 16, color: '#222226' }}>
               Rp. {Utils.currencyCommas(String(total_balance))}
             </Text>
           </View>
 
-          <View style={{ flex: 1, padding: 5, flexDirection: 'row' }}>
-            <TouchableOpacity style={{ backgroundColor: '#9896ff', flex: 1, justifyContent: 'center', alignItems: 'center', marginRight: 5, borderRadius: 5 }} activeOpacity={0.5} onPress={() => this.addUser()}>
-              <Text style={{ textAlign: 'center', color: '#FFFFFF' }}>
-                Add User
-                            </Text>
+          <View style={{ flex: 1, padding: 5, flexDirection: 'row', justifyContent: 'flex-end' }}>
+            <TouchableOpacity style={{ backgroundColor: '#9896ff', justifyContent: 'center', alignItems: 'center', marginRight: 5, borderRadius: 100, padding: 15 }} activeOpacity={0.5} onPress={() => this.addUser()}>
+              <Icon
+                style={{ textAlign: 'center' }}
+                name='user-plus'
+                size={18}
+                color='#FFFFFF'
+              />
             </TouchableOpacity>
 
-            <TouchableOpacity style={{ backgroundColor: '#9896ff', flex: 1, justifyContent: 'center', alignItems: 'center', borderRadius: 5 }} activeOpacity={0.5} onPress={() => this.listOrder()}>
-              <Text style={{ textAlign: 'center', color: '#FFFFFF' }}>
-                List Order Lunch
-                            </Text>
+            <TouchableOpacity style={{ backgroundColor: '#9896ff', justifyContent: 'center', alignItems: 'center', borderRadius: 100, padding: 20 }} activeOpacity={0.5} onPress={() => this.listOrder()}>
+              <Icon
+                style={{ textAlign: 'center' }}
+                name='clipboard-list'
+                size={18}
+                color='#FFFFFF'
+              />
             </TouchableOpacity>
           </View>
         </View>

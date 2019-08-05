@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Text, View, StyleSheet, ActivityIndicator, Dimensions, Platform, TouchableOpacity, FlatList, RefreshControl, ScrollView, TextInput, Alert } from 'react-native'
-import { Fab, Icon, Button, } from 'native-base'
+import { Fab, Button, } from 'native-base'
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import DatePicker from 'react-native-datepicker'
 import { connect } from 'react-redux'
 
@@ -91,8 +92,12 @@ class AddUser extends Component {
         <View style={{ flex: 1 }}>
           <View style={{ backgroundColor: '#9896ff', flexDirection: 'row', justifyContent: 'space-between', height: 60 }}>
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-start' }}>
-              <TouchableOpacity style={{ backgroundColor: '#6565db', marginLeft: 15, paddingHorizontal: 5, paddingVertical: 10, borderRadius: 5 }} onPress={() => this.goBack()}>
-                <Text style={{ fontSize: 14, color: '#FFFFFF' }}>BACK</Text>
+              <TouchableOpacity style={{ marginLeft: 15, paddingHorizontal: 15, paddingVertical: 10, borderRadius: 5 }} onPress={() => this.goBack()}>
+                <Icon
+                  name='chevron-left'
+                  size={18}
+                  color='#FFFFFF'
+                />
               </TouchableOpacity>
             </View>
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
