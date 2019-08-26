@@ -6,6 +6,7 @@ export const addUser = (id, name, balance, date) => ({
     "balance": Number(balance),
     "date": date,
     "transaction": [],
+    "order": {},
   }
 })
 export const deleteAllUser = () => ({
@@ -15,7 +16,7 @@ export const deleteUser = (id) => ({
   type: 'DELETE_USER',
   id: id,
 })
-export const updateUser = (id, name, balance, date, transaction) => ({
+export const updateUser = (id, name, balance, date, transaction, order) => ({
   type: 'UPDATE_USER',
   data: {
     "id": id,
@@ -23,6 +24,7 @@ export const updateUser = (id, name, balance, date, transaction) => ({
     "balance": Number(balance),
     "date": date,
     "transaction": transaction,
+    "order": order,
   }
 })
 export const addTransaction = (id, total, note, type, date, id_user) => ({
@@ -60,6 +62,10 @@ export const refreshList = (refresh_list) => ({
   type: 'REFRESH_LIST',
   refresh_list
 })
+export const loadingProccess = (loading_proccess) => ({
+  type: 'LOADING_PROCCESS',
+  loading_proccess
+})
 export const transferBalance = (id_from, name_from, id_to, name_to, id_from_transfer, id_to_transfer, total_transfer, date_transfer) => ({
   type: "TRANSFER_BALANCE",
   id_from,
@@ -70,4 +76,35 @@ export const transferBalance = (id_from, name_from, id_to, name_to, id_from_tran
   id_to_transfer,
   total_transfer: Number(total_transfer),
   date_transfer,
+})
+export const addListOrder = (id_account, food_order, price_order) => ({
+  type: "ADD_LIST_ORDER",
+  id_account,
+  data: {
+    food: food_order,
+    price: Number(price_order),
+    order_complete: false,
+  },
+})
+export const updateListOrder = (id_account, food_order, price_order) => ({
+  type: "UPDATE_LIST_ORDER",
+  id_account,
+  food: food_order,
+  price: Number(price_order),
+})
+export const deleteListOrder = (id_user) => ({
+  type: "DELETE_LIST_ORDER",
+  id_user
+})
+export const deleteAllListOrder = () => ({
+  type: "DELETE_ALL_LIST_ORDER",
+})
+export const addOrderToTransaction = (date) => ({
+  type: "ADD_ORDER_TRANSACTION",
+  date
+})
+export const completeOrder = (id_user, complete_order) => ({
+  type: "COMPLETE_ORDER",
+  id_user,
+  complete_order
 })

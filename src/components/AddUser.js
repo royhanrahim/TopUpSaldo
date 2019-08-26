@@ -49,9 +49,9 @@ class AddUser extends Component {
 
     if (params) {
       if (name == "" || balance == "") {
-        Alert.alert("Warning", "Please complete the fields")
+        Alert.alert("Warning", "Silakan lengkapi kolomnya")
       } else {
-        this.props.updateUser(params.data.id, name, params.data.balance, date, params.data.transaction)
+        this.props.updateUser(params.data.id, name, params.data.balance, date, params.data.transaction, params.data.order)
         this.props.navigation.goBack()
       }
     } else {
@@ -61,11 +61,11 @@ class AddUser extends Component {
 
       if (name == "") {
         this.setState({
-          errorName: "Name can't be empty"
+          errorName: "Nama tidak boleh kosong"
         })
       } else if (balance == "") {
         this.setState({
-          errorBalance: "Balance can't be empty"
+          errorBalance: "Saldo tidak boleh kosong"
         })
       } else {
         this.props.addUser(UUID.join(""), name, balance, date)
@@ -90,7 +90,19 @@ class AddUser extends Component {
     return (
       <View style={styles.container}>
         <View style={{ flex: 1 }}>
-          <View style={{ backgroundColor: '#9896ff', flexDirection: 'row', justifyContent: 'space-between', height: 60 }}>
+          <View
+            style={{
+              backgroundColor: '#9896ff',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              height: 60,
+              elevation: 5,
+              shadowColor: 'black',
+              shadowOffset: { width: 0, height: 0.5 * 5 },
+              shadowOpacity: 0.3,
+              shadowRadius: 0.8 * 5
+            }}
+          >
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-start' }}>
               <TouchableOpacity style={{ marginLeft: 15, paddingHorizontal: 15, paddingVertical: 10, borderRadius: 5 }} onPress={() => this.goBack()}>
                 <Icon
@@ -101,7 +113,7 @@ class AddUser extends Component {
               </TouchableOpacity>
             </View>
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-              <Text style={{ fontSize: 18, color: '#FFFFFF', textAlign: 'center' }}>{params ? "EDIT" : "ADD"} USER</Text>
+              <Text style={{ fontSize: 18, color: '#FFFFFF', textAlign: 'center' }}>{params ? "UBAH" : "TAMBAH"} PENGGUNA</Text>
             </View>
             <View style={{ flex: 1 }} />
           </View>
@@ -111,11 +123,12 @@ class AddUser extends Component {
               ref={(name) => { this.name = name }}
               style={{ borderBottomWidth: 0.5, fontSize: 14, color: '#222226', paddingLeft: 0, paddingBottom: 0 }}
               value={name}
-              placeholder={"Name"}
+              placeholder={"Nama"}
               placeholderTextColor={"#c5c5d1"}
               onChangeText={(name) => this.setState({ name, errorName: "" })}
               onSubmitEditing={() => this.balance.focus()}
               returnKeyType={"next"}
+              autoFocus={true}
             />
             {errorName !== "" ?
               <Text style={{ color: '#cf2749', paddingVertical: 5, textAlignVertical: 'center', justifyContent: 'center', alignItems: 'center' }}>
@@ -129,7 +142,7 @@ class AddUser extends Component {
                 ref={(balance) => { this.balance = balance }}
                 style={{ borderBottomWidth: 0.5, fontSize: 14, color: '#222226', paddingLeft: 0, paddingBottom: 0 }}
                 value={balance}
-                placeholder={"Balance / Saldo"}
+                placeholder={"Saldo"}
                 placeholderTextColor={"#c5c5d1"}
                 onChangeText={(balance) => this.setState({ balance, errorBalance: "" })}
                 keyboardType={"number-pad"}
@@ -179,7 +192,7 @@ class AddUser extends Component {
 
           <View style={{ backgroundColor: '#FFFFFF', paddingHorizontal: 20, paddingVertical: 10, justifyContent: 'flex-end', alignItems: 'flex-end' }}>
             <TouchableOpacity style={{ width: 120, height: 50, backgroundColor: '#9896ff', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 5 }} activeOpacity={0.5} onPress={() => this.saveUser()}>
-              <Text style={{ fontSize: 18, color: '#FFFFFF' }}>{params ? "UPDATE" : "SAVE"}</Text>
+              <Text style={{ fontSize: 18, color: '#FFFFFF' }}>{params ? "PERBARUI" : "SIMPAN"}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -194,7 +207,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   addUser: (id, name, balance, date) => dispatch(addUser(id, name, balance, date)),
-  updateUser: (id, name, balance, date, transaction) => dispatch(updateUser(id, name, balance, date, transaction)),
+  updateUser: (id, name, balance, date, transaction, order) => dispatch(updateUser(id, name, balance, date, transaction, order)),
 })
 
 //make this component available to the app

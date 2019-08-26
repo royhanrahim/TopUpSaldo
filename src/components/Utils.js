@@ -1,18 +1,4 @@
 module.exports = {
-  formatMonth: [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
-  ],
   currencyCommas(nStr) {
     nStr = parseFloat(nStr).toFixed(2)
     nStr += '';
@@ -27,6 +13,6 @@ module.exports = {
     while (rgx.test(x1)) {
       x1 = x1.replace(rgx, '$1' + '.' + '$2');
     }
-    return x1 + x2;
+    return x1;
   }
 }
