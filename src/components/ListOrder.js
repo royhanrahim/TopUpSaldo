@@ -58,7 +58,7 @@ class ListOrder extends Component {
         this.setState({
           errorFood: true
         })
-      } else {        
+      } else {
         this.props.updateListOrder(id_user, food, price)
         this.setState({
           id_user: "",
@@ -239,9 +239,11 @@ class ListOrder extends Component {
     })
   }
   changePrice = (text) => {
+    let amount = text.split(".").join('')
+
     this.setState({
       errorPrice: false,
-      price: text
+      price: amount
     })
   }
 
@@ -282,19 +284,18 @@ class ListOrder extends Component {
           </View>
 
           <View style={{ flex: 1, paddingVertical: 3, marginBottom: 5, flexDirection: 'row', }}>
-            <View style={{ flex: item.order.food && String(item.order.price) ? 0.8 : 1, alignItems: 'center', flexDirection: 'row' }}>
+            <TouchableOpacity style={{ flex: item.order.food && String(item.order.price) ? 0.8 : 1, alignItems: 'center', flexDirection: 'row' }} activeOpacity={0.7} onPress={() => this.changeSquare(item.id, item.order.order_complete)}>
               <Icon
                 name={item.order.order_complete == true ? 'check-square' : 'square'}
                 size={22}
                 color='#9896ff'
-                onPress={() => this.changeSquare(item.id, item.order.order_complete)}
               />
 
               <Text style={{ paddingVertical: 3, fontSize: 14, color: '#222226', marginLeft: 5, }}>
                 {item.order.food ? item.order.food : "-"}
               </Text>
 
-            </View>
+            </TouchableOpacity>
 
             <View style={{ flex: 0.2, justifyContent: 'center', alignItems: 'center', }}>
               <View style={{ flexDirection: 'row', marginBottom: 5, }}>
@@ -477,9 +478,10 @@ class ListOrder extends Component {
                   borderBottomColor: '#7e7e82',
                 }}
                 placeholder="Harga"
-                value={String(price)}
+                value={Utils.formatterCurrencyBillion(String(price))}
                 onChangeText={(text) => this.changePrice(text)}
                 keyboardType="number-pad"
+                maxLength={13}
                 returnKeyType="done"
                 onSubmitEditing={() => this.addListOrder()}
               />
@@ -494,16 +496,30 @@ class ListOrder extends Component {
                       paddingVertical: 10,
                       borderBottomColor: '#7e7e82',
                       borderBottomWidth: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
                     }}
                   >
                     <Text
                       style={{
                         fontSize: 14,
                         color: name_user !== "" ? '#222226' : 'rgba(97, 92, 255, 1)',
+                        flex: 1,
                       }}
+                      onPress={() => this.setState({ errorUser: false, id_user: "", name_user: "", })}
                     >
                       {name_user !== "" ? name_user : "Tekan salah satu pengguna di bawah ini"}
                     </Text>
+                    {name_user !== "" ?
+                      <Icon
+                        name='times'
+                        size={14}
+                        color='#222226'
+                        style={{ marginHorizontal: 5, }}
+                        onPress={() => this.setState({ errorUser: false, id_user: "", name_user: "", })}
+                      />
+                      : null
+                    }
                   </View>
                   {errorUser == true &&
                     <Text style={{ color: '#cf2749', paddingHorizontal: 10, paddingVertical: 5, textAlignVertical: 'center', justifyContent: 'center', alignItems: 'center' }}>
@@ -514,6 +530,7 @@ class ListOrder extends Component {
                     style={{ marginHorizontal: 10 }}
                     data={users.users}
                     horizontal={true}
+                    showsHorizontalScrollIndicator={false}
                     indicatorStyle="white"
                     renderItem={({ item, index }) =>
                       item.length !== 0 ?

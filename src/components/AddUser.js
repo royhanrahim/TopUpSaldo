@@ -13,6 +13,8 @@ import Utils from '../components/Utils';
 
 var moment = require('moment');
 
+const formatter = new Intl.NumberFormat('id', { useGrouping: true })
+
 let SCREEN_WIDTH = Dimensions.get('window').width
 let SCREEN_HEIGHT = Dimensions.get('window').height
 let DATE = new Date()
@@ -26,7 +28,6 @@ class AddUser extends Component {
       date: moment(DATE).format("DD MMMM YYYY"),
       transaction: [],
       errorName: '',
-      errorBalance: '',
     }
   }
 
@@ -63,10 +64,6 @@ class AddUser extends Component {
         this.setState({
           errorName: "Nama tidak boleh kosong"
         })
-      } else if (balance == "") {
-        this.setState({
-          errorBalance: "Saldo tidak boleh kosong"
-        })
       } else {
         this.props.addUser(UUID.join(""), name, balance, date)
         this.props.navigation.goBack()
@@ -82,10 +79,18 @@ class AddUser extends Component {
     this.props.navigation.goBack()
   }
 
+  changeBalance = (value) => {
+    let amount = value.split(".").join('')
+
+    this.setState({
+      balance: amount
+    })
+  }
+
   render() {
     let { users } = this.props
     let params = this.props.navigation.state.params
-    const { name, balance, date, errorName, errorBalance } = this.state
+    const { name, balance, date, errorName } = this.state
 
     return (
       <View style={styles.container}>
@@ -141,20 +146,16 @@ class AddUser extends Component {
               <TextInput
                 ref={(balance) => { this.balance = balance }}
                 style={{ borderBottomWidth: 0.5, fontSize: 14, color: '#222226', paddingLeft: 0, paddingBottom: 0 }}
-                value={balance}
+                value={Utils.formatterCurrencyBillion(balance)}
+                defaultValue={balance}
                 placeholder={"Saldo"}
                 placeholderTextColor={"#c5c5d1"}
-                onChangeText={(balance) => this.setState({ balance, errorBalance: "" })}
+                onChangeText={(balance) => this.changeBalance(balance)}
                 keyboardType={"number-pad"}
                 returnKeyType={"done"}
+                maxLength={13}
                 onSubmitEditing={() => this.saveUser()}
               />
-            }
-            {errorBalance !== "" ?
-              <Text style={{ color: '#cf2749', paddingVertical: 5, textAlignVertical: 'center', justifyContent: 'center', alignItems: 'center' }}>
-                {errorBalance}
-              </Text>
-              : null
             }
             <View style={{ justifyContent: 'center', marginTop: 10 }}>
               <DatePicker
@@ -164,19 +165,10 @@ class AddUser extends Component {
                 placeholder="Select Date"
                 format="DD MMMM YYYY"
                 minDate="1900-01-01"
-                // maxDate="2016-06-01"
                 confirmBtnText="Confirm"
                 cancelBtnText="Cancel"
-                // showIcon={false}
                 customStyles={{
-                  // dateIcon: {
-                  //     position: 'absolute',
-                  //     left: 0,
-                  //     top: 4,
-                  //     marginLeft: 0
-                  // },
                   dateInput: {
-                    // marginLeft: 36,
                     // backgroundColor: 'skyblue',
                     borderLeftWidth: 0,
                     borderRightWidth: 0,

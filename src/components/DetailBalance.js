@@ -208,6 +208,23 @@ class DetailBalance extends Component {
     }
   }
 
+  changeTotal = (value) => {
+    let amount = value.split(".").join('')
+
+    this.setState({
+      total: amount,
+      errorValidation: false
+    })
+  }
+  changeTotalTransfer = (value) => {
+    let amount = value.split(".").join('')
+
+    this.setState({
+      total_transfer: amount,
+      errorTotalTransfer: false,
+    })
+  }
+
   _onRefresh = () => {
     this.props.refreshList(true)
     setTimeout(() => {
@@ -427,10 +444,11 @@ class DetailBalance extends Component {
                 <TextInput
                   style={{ borderBottomWidth: 0.5, color: '#222226', paddingLeft: 0, paddingBottom: 0, fontSize: 14, marginBottom: 10 }}
                   placeholder={editTransaction == true ? `Total past transactions (${ex_total})` : 'Total'}
-                  value={total}
+                  value={Utils.formatterCurrencyBillion(total)}
                   placeholderTextColor={'#7e7e82'}
                   keyboardType={'number-pad'}
-                  onChangeText={(total) => this.setState({ total: total, errorValidation: false })}
+                  maxLength={13}
+                  onChangeText={(total) => this.changeTotal(total)}
                   onSubmitEditing={() => this.note.focus()}
                   returnKeyType={'next'}
                   autoFocus={true}
@@ -502,10 +520,11 @@ class DetailBalance extends Component {
                 <TextInput
                   style={{ borderBottomWidth: 0.5, color: '#222226', paddingLeft: 0, paddingBottom: 0, fontSize: 14, marginBottom: 10 }}
                   placeholder={"Total Transfer"}
-                  value={total_transfer}
+                  value={Utils.formatterCurrencyBillion(total_transfer)}
                   placeholderTextColor={'#7e7e82'}
                   keyboardType={'number-pad'}
-                  onChangeText={(total) => this.setState({ total_transfer: total, errorTotalTransfer: false })}
+                  maxLength={13}
+                  onChangeText={(total) => this.changeTotalTransfer(total)}
                   returnKeyType={'done'}
                 />
                 {errorTotalTransfer == true ?
@@ -545,7 +564,7 @@ class DetailBalance extends Component {
                   <FlatList
                     data={users.users}
                     horizontal={true}
-                    indicatorStyle="white"
+                    showsHorizontalScrollIndicator={false}
                     renderItem={({ item, index }) =>
                       item.length !== 0 ?
                         item.id == params.data.id ?
