@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, View, StyleSheet, ActivityIndicator, Dimensions, Platform, TouchableOpacity, FlatList, RefreshControl, Alert, Modal, TextInput } from 'react-native'
+import { Text, View, StyleSheet, ActivityIndicator, Dimensions, Platform, TouchableOpacity, FlatList, RefreshControl, Alert, Modal, TextInput, ScrollView } from 'react-native'
 import { Fab, Button } from 'native-base'
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { connect } from 'react-redux'
@@ -29,11 +29,8 @@ class DetailBalance extends Component {
       errorValidation: false,
       errorTotalTransfer: false,
       errorAccountTransfer: false,
-      editTransaction: false,
-      typeEdit: false,
       id_transaction: "",
       total: "",
-      ex_total: "",
       total_transfer: "",
       id_transfer: "",
       name_transfer: "",
@@ -44,10 +41,6 @@ class DetailBalance extends Component {
   }
 
   componentDidMount() {
-  }
-
-  componentWillReceiveProps() {
-
   }
 
   modalTransaction = (value) => {
@@ -62,7 +55,7 @@ class DetailBalance extends Component {
     const params = this.props.navigation.state.params
 
     Alert.alert(
-      "Warning", "Apakah Anda ingin menghapus transaksi ini ?",
+      "Peringatan", "Apakah Anda ingin menghapus transaksi ini ?",
       [
         {
           text: 'Iya',
@@ -71,17 +64,6 @@ class DetailBalance extends Component {
         { text: 'Tidak', style: 'cancel', },
       ],
       { cancelable: false })
-  }
-
-  editTransaction = (item) => {
-    this.setState({
-      modalVisible: true,
-      editTransaction: true,
-      id_transaction: item.id,
-      // total: String(item.total),
-      ex_total: String(item.total),
-      note: item.note,
-    })
   }
 
   goBack = () => {
@@ -99,12 +81,12 @@ class DetailBalance extends Component {
     }
 
     if (params.data.balance == 0) {
-      Alert.alert("Warning", "Harap isi saldo terlebih dahulu")
+      Alert.alert("Peringatan", "Harap isi saldo terlebih dahulu")
     } else if (params.data.balance < 0) {
-      Alert.alert("Warning", "Maaf saldo Anda sudah kurang dari nol, mohon isi saldo terlebih dahulu")
+      Alert.alert("Peringatan", "Maaf saldo Anda sudah kurang dari nol, mohon isi saldo terlebih dahulu")
     } else {
       Alert.alert(
-        "Warning", "Apakah Anda ingin mengambil semua saldo ?",
+        "Peringatan", "Apakah Anda ingin mengambil semua saldo ?",
         [
           {
             text: 'Iya',
@@ -120,7 +102,7 @@ class DetailBalance extends Component {
 
   deleteAllTransaction = (value) => {
     Alert.alert(
-      "Warning", "Apakah Anda ingin menghapus semua transaksi ?",
+      "Peringatan", "Apakah Anda ingin menghapus semua transaksi ?",
       [
         {
           text: 'Iya',
@@ -132,28 +114,19 @@ class DetailBalance extends Component {
   }
 
   saveTransaction = () => {
-    const { total, note, date, type, editTransaction, id_transaction, typeEdit, ex_total } = this.state
+    const { total, note, date, type, id_transaction, } = this.state
     let params = this.props.navigation.state.params
     var UUID = [];
 
-    if (editTransaction == true) {
-      if (total == "") {
-        this.setState({ errorValidation: true })
-      } else {
-        this.props.updateTransaction(id_transaction, params.data.id, total, ex_total, note, typeEdit)
-        this.cancelSave()
-      }
+    if (total == "") {
+      this.setState({ errorValidation: true })
     } else {
-      if (total == "") {
-        this.setState({ errorValidation: true })
-      } else {
-        for (var i = 0; i < 10; i++) {
-          UUID.push(Math.floor(Math.random() * 6) + 1)
-        }
-
-        this.props.addTransaction(UUID.join(""), total, note, type, date, params.data.id)
-        this.cancelSave()
+      for (var i = 0; i < 10; i++) {
+        UUID.push(Math.floor(Math.random() * 6) + 1)
       }
+
+      this.props.addTransaction(UUID.join(""), total, note, type, date, params.data.id)
+      this.cancelSave()
     }
   }
 
@@ -163,10 +136,10 @@ class DetailBalance extends Component {
     var ID_FROM_TRANSACTION = [];
     var ID_TO_TRANSACTION = []
 
-    if (total_transfer == "") {
-      this.setState({ errorTotalTransfer: true })
-    } else if (name_transfer == "") {
+    if (name_transfer == "") {
       this.setState({ errorAccountTransfer: true })
+    } else if (total_transfer == "") {
+      this.setState({ errorTotalTransfer: true })
     } else {
       for (var i = 0; i < 10; i++) {
         ID_FROM_TRANSACTION.push(Math.floor(Math.random() * 6) + 1)
@@ -187,7 +160,7 @@ class DetailBalance extends Component {
   }
 
   cancelSave = () => {
-    this.setState({ modalVisible: false, id_transaction: '', total: '', note: '', type: "", errorValidation: false, typeEdit: false, editTransaction: false, ex_total: "", })
+    this.setState({ modalVisible: false, id_transaction: '', total: '', note: '', type: "", errorValidation: false, })
   }
 
   cancelTransfer = () => {
@@ -199,13 +172,6 @@ class DetailBalance extends Component {
       errorTotalTransfer: false,
       errorAccountTransfer: false,
     })
-  }
-
-  changeTypeEdit = () => {
-    this.setState({ typeEdit: true })
-    if (this.state.typeEdit == true) {
-      this.setState({ typeEdit: false })
-    }
   }
 
   changeTotal = (value) => {
@@ -232,48 +198,35 @@ class DetailBalance extends Component {
     }, 500);
   }
 
-  renderListTransaction(item, index) {
+  renderListTransaction(item, index, first, last) {
     const { } = this.state
 
     return (
       <View
         key={index}
-        style={{
-          backgroundColor: 'rgba(250, 250, 250, 1)',
-          paddingHorizontal: 10,
-          paddingVertical: 5,
-          marginTop: 10,
-          marginBottom: 5,
-          borderRadius: 5,
-          marginHorizontal: 10,
-          elevation: 5,
-          shadowColor: 'black',
-          shadowOffset: { width: 0, height: 0.5 * 5 },
-          shadowOpacity: 0.3,
-          shadowRadius: 0.8 * 5
-        }}
+        style={[styles.containerListTransaction, { marginTop: item.id == first ? 20 : 10, marginBottom: item.id == last ? 20 : 5 }]}
       >
         <View style={{ paddingVertical: 5 }}>
-          <View style={{ flexDirection: 'row', flex: 1, borderBottomWidth: 0.5, paddingBottom: 5 }}>
+          <View style={{ flexDirection: 'row', flex: 1, borderBottomWidth: 0.5, paddingBottom: 5, borderBottomColor: '#808080' }}>
             <View style={{ flex: 1, }}>
-              <Text style={{ fontSize: 14, color: item.total > 0 ? 'rgba(102, 82, 255, 1)' : 'rgba(255, 0, 0, 1)' }}>{item.total > 0 ? "Ditambah :" : "Dikurang :"}</Text>
-              <Text style={{ fontSize: 16, color: '#222226' }}>Rp. {Utils.currencyCommas(String(item.total))}</Text>
+              <Text style={{ fontSize: 14, fontFamily: 'Bellota-Regular', color: item.total > 0 ? '#6652ff' : '#ff0000' }}>{item.total > 0 ? "Ditambah :" : "Dikurang :"}</Text>
+              <Text style={{ fontSize: 16, fontFamily: 'Bellota-Regular', color: '#222226' }}>Rp. {Utils.currencyCommas(String(item.total))}</Text>
             </View>
 
             <View style={{ alignItems: 'flex-end', flex: 1, }}>
-              <Text style={{ fontSize: 14, color: 'rgba(118, 173, 120, 1)' }}>Saldo Terakhir</Text>
-              <Text style={{ fontSize: 14, color: '#222226' }}>Rp. {Utils.currencyCommas(String(item.last_balance ? item.last_balance : 0))}</Text>
+              <Text style={{ fontSize: 14, fontFamily: 'Bellota-Regular', color: '#76ad78' }}>Saldo Terakhir</Text>
+              <Text style={{ fontSize: 14, fontFamily: 'Bellota-Regular', color: '#222226' }}>Rp. {Utils.currencyCommas(String(item.last_balance ? item.last_balance : 0))}</Text>
             </View>
           </View>
 
           <View style={{ flexDirection: 'row', flex: 1, paddingTop: 5, }}>
             <View style={{ flex: 1, }}>
-              <Text style={{ fontSize: 14, color: '#222226' }}>Catatan :</Text>
-              <Text style={{ fontSize: 16, color: '#222226' }}>{item.note == "" ? "-" : item.note}</Text>
+              <Text style={{ fontSize: 14, fontFamily: 'Bellota-Regular', color: '#222226' }}>Catatan :</Text>
+              <Text style={{ fontSize: 16, fontFamily: 'Bellota-Regular', color: '#222226' }}>{item.note == "" ? "-" : item.note}</Text>
             </View>
 
             <View style={{ flex: 0.5, alignItems: 'flex-end' }}>
-              <Text style={{ fontSize: 14, color: '#222226' }}>{item.date}</Text>
+              <Text style={{ fontSize: 14, fontFamily: 'Bellota-Regular', color: '#222226', textAlign: 'right' }}>{item.date}</Text>
               <Icon
                 onPress={() => this.deleteTransaction(item)}
                 name='trash'
@@ -283,11 +236,6 @@ class DetailBalance extends Component {
               />
             </View>
           </View>
-
-          {/* <View style={{ paddingTop: 5, backgroundColor: 'grey' }}>
-            <Text style={{ fontSize: 14, color: '#222226' }}>Catatan :</Text>
-            <Text style={{ fontSize: 16, color: '#222226' }}>{item.note == "" ? "-" : item.note}</Text>
-          </View> */}
         </View>
       </View>
     )
@@ -297,8 +245,10 @@ class DetailBalance extends Component {
     let { users } = this.props
     let params = this.props.navigation.state.params
     let arrayTransaction = []
+    let firstIndex = ""
+    let lastIndex = ""
     const index = users.users.findIndex((e) => e.id === params.data.id);
-    const { note, total, total_transfer, id_transfer, name_transfer, ex_total, errorValidation, errorTotalTransfer, errorAccountTransfer, editTransaction, typeEdit } = this.state
+    const { note, total, total_transfer, id_transfer, name_transfer, errorValidation, errorTotalTransfer, errorAccountTransfer } = this.state
 
     if (index !== -1) {
       if (users.users[index].transaction.length !== 0) {
@@ -306,23 +256,19 @@ class DetailBalance extends Component {
       }
     }
 
+    if (arrayTransaction[0]) {
+      firstIndex = arrayTransaction[0].id
+    }
+    if (arrayTransaction[arrayTransaction.length - 1]) {
+      lastIndex = arrayTransaction[arrayTransaction.length - 1].id
+    }
+
     return (
       <View style={styles.container}>
         <View style={{ flex: 92 }}>
-          <View
-            style={{
-              backgroundColor: '#9896ff',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              height: 60,
-              elevation: 5,
-              shadowColor: 'black',
-              shadowOffset: { width: 0, height: 0.5 * 5 },
-              shadowOpacity: 0.3,
-              shadowRadius: 0.8 * 5
-            }}>
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-start' }}>
-              <TouchableOpacity style={{ marginLeft: 10, paddingHorizontal: 15, paddingVertical: 10, borderRadius: 5 }} onPress={() => this.goBack()}>
+          <View style={styles.containerHeader}>
+            <View style={styles.containerLeftHeader}>
+              <TouchableOpacity style={styles.buttonBack} onPress={() => this.goBack()}>
                 <Icon
                   name='chevron-left'
                   size={18}
@@ -330,18 +276,12 @@ class DetailBalance extends Component {
                 />
               </TouchableOpacity>
             </View>
-            <View style={{ flex: 1.5, justifyContent: 'center', alignItems: 'center', }}>
-              <Text style={{ fontSize: 18, color: '#FFFFFF', textAlign: 'center', marginHorizontal: 5 }} numberOfLines={2}>SALDO DETAIL {params.data.name}</Text>
+            <View style={styles.containerCenterHeader}>
+              <Text style={styles.textContainerCenterHeader} numberOfLines={2}>SALDO DETAIL {params.data.name}</Text>
             </View>
-            <View style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center', flexDirection: 'row' }}>
+            <View style={styles.containerRightHeader}>
               <TouchableOpacity
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: 5,
-                  paddingHorizontal: 15,
-                  paddingVertical: 10,
-                }}
+                style={styles.buttonGetAllBalance}
                 onPress={() => this.getAllBalance(arrayTransaction)}
               >
                 <Icon
@@ -351,15 +291,7 @@ class DetailBalance extends Component {
                 />
               </TouchableOpacity>
               <TouchableOpacity
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: 5,
-                  paddingHorizontal: 15,
-                  paddingVertical: 10,
-                  marginRight: 10,
-                  marginLeft: 5,
-                }}
+                style={styles.buttonDeleteAllTransaction}
                 onPress={() => this.deleteAllTransaction(params.data)}
               >
                 <Icon
@@ -372,14 +304,13 @@ class DetailBalance extends Component {
           </View>
 
           {arrayTransaction.length == 0 ?
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFFFFF' }}>
-              <Text style={{ fontSize: 22, color: '#222226' }}>Tidak ada data</Text>
+            <View style={styles.containerNoData}>
+              <Text style={styles.textNoData}>Tidak ada data</Text>
             </View>
             :
             <FlatList
               data={arrayTransaction}
-              // extraData={this.state}
-              renderItem={({ item, index }) => this.renderListTransaction(item, index)}
+              renderItem={({ item, index }) => this.renderListTransaction(item, index, firstIndex, lastIndex)}
               keyExtractor={(item, index) => `key-${item.id}`}
               refreshControl={
                 <RefreshControl
@@ -391,38 +322,40 @@ class DetailBalance extends Component {
               }
             />
           }
-
         </View>
 
-        <View style={{ flex: 8, flexDirection: 'row' }}>
-          <View style={{ flex: 1, justifyContent: 'center', paddingLeft: 5 }}>
-            <Text style={{ flex: 1, textAlignVertical: 'center', fontSize: 18, color: '#222226' }}>
+        <View style={styles.containerFooter}>
+          <View style={styles.containerLeftFooter}>
+            <Text style={styles.textTotalBalance}>
               Sisa Saldo :
             </Text>
-            <Text numberOfLines={2} style={{ flex: 1, textAlignVertical: 'center', fontSize: 16, color: '#222226' }}>
+            <Text style={[styles.textBalance, { color: params.data.balance < 0 ? '#ff0000' : '#6652ff' }]}>
               Rp. {Utils.currencyCommas(String(params.data.balance))}
             </Text>
           </View>
 
-          <View style={{ flex: 1, padding: 5, flexDirection: 'row', justifyContent: 'flex-end', }}>
-            <TouchableOpacity style={{ backgroundColor: '#9896ff', justifyContent: 'center', alignItems: 'center', borderRadius: 5, paddingHorizontal: 18 }} activeOpacity={0.5} onPress={() => this.modalTransfer()}>
+          <View style={styles.containerRightFooter}>
+            <TouchableOpacity style={styles.containerButtonTF} activeOpacity={0.5} onPress={() => this.modalTransfer()}>
               <Icon
+                style={{ textAlign: 'center' }}
                 name='paper-plane'
                 size={18}
                 color='#FFFFFF'
               />
             </TouchableOpacity>
 
-            <TouchableOpacity style={{ backgroundColor: '#9896ff', justifyContent: 'center', alignItems: 'center', borderRadius: 5, paddingHorizontal: 18, marginHorizontal: 5 }} activeOpacity={0.5} onPress={() => this.modalTransaction(false)}>
+            <TouchableOpacity style={styles.containerButtonMinus} activeOpacity={0.5} onPress={() => this.modalTransaction(false)}>
               <Icon
+                style={{ textAlign: 'center' }}
                 name='minus'
                 size={18}
                 color='#FFFFFF'
               />
             </TouchableOpacity>
 
-            <TouchableOpacity style={{ backgroundColor: '#9896ff', justifyContent: 'center', alignItems: 'center', borderRadius: 5, paddingHorizontal: 18 }} activeOpacity={0.5} onPress={() => this.modalTransaction(true)}>
+            <TouchableOpacity style={styles.containerButtonPlus} activeOpacity={0.5} onPress={() => this.modalTransaction(true)}>
               <Icon
+                style={{ textAlign: 'center' }}
                 name='plus'
                 size={18}
                 color='#FFFFFF'
@@ -438,12 +371,12 @@ class DetailBalance extends Component {
           onRequestClose={() => {
             this.cancelSave()
           }}>
-          <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)', flex: 1, justifyContent: 'flex-end', alignItems: 'center' }}>
-            <View style={{ width: SCREEN_WIDTH, padding: 10 }}>
-              <View style={{ backgroundColor: 'rgba(250, 250, 250, 1)', justifyContent: 'center', paddingTop: 10, paddingBottom: 50, paddingHorizontal: 10, borderTopLeftRadius: 5, borderTopRightRadius: 5 }}>
+          <TouchableOpacity style={styles.containerModal} activeOpacity={1} onPress={() => this.cancelSave()}>
+            <View style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT / 2.5 }}>
+              <ScrollView style={styles.containerInput}>
                 <TextInput
-                  style={{ borderBottomWidth: 0.5, color: '#222226', paddingLeft: 0, paddingBottom: 0, fontSize: 14, marginBottom: 10 }}
-                  placeholder={editTransaction == true ? `Total past transactions (${ex_total})` : 'Total'}
+                  style={styles.containerInputTotal}
+                  placeholder={'Total'}
                   value={Utils.formatterCurrencyBillion(total)}
                   placeholderTextColor={'#7e7e82'}
                   keyboardType={'number-pad'}
@@ -454,57 +387,33 @@ class DetailBalance extends Component {
                   autoFocus={true}
                 />
                 {errorValidation == true ?
-                  <Text style={{ color: '#cf2749', paddingVertical: 5, textAlignVertical: 'center', justifyContent: 'center', alignItems: 'center' }}>
-                    Silakan lengkapi kolomnya
+                  <Text style={styles.textErrorTotal}>
+                    Silahkan lengkapi kolomnya
                   </Text>
                   : null
                 }
                 <TextInput
                   ref={(note) => { this.note = note }}
-                  style={{ borderBottomWidth: 0.5, color: '#222226', paddingLeft: 0, paddingBottom: 0, fontSize: 14 }}
-                  placeholder={'Catatan'}
+                  style={styles.containerInputNote}
+                  placeholder={`Catatan${'\n'}(Tekan enter untuk menambahkan catatan)`}
                   value={note}
                   multiline={true}
                   placeholderTextColor={'#7e7e82'}
                   keyboardType={'default'}
                   onChangeText={(note) => this.setState({ note: note, errorValidation: false })}
                 />
-              </View>
-              {editTransaction == true ?
-                <View style={{ backgroundColor: 'rgba(250, 250, 250, 1)', justifyContent: 'flex-end', alignItems: 'center', paddingRight: 5, flexDirection: 'row', }}>
-                  <TouchableOpacity style={{ backgroundColor: '#9896ff', marginRight: 5, width: 60, height: 40, borderRadius: 5, justifyContent: 'center', alignItems: 'center' }} onPress={() => this.changeTypeEdit()}>
-                    {typeEdit == false ?
-                      <Icon
-                        name='minus'
-                        size={18}
-                        color='#FFFFFF'
-                      />
-                      :
-                      <Icon
-                        name='plus'
-                        size={18}
-                        color='#FFFFFF'
-                      />
-                    }
-                  </TouchableOpacity>
-                </View>
-                : null
-              }
+              </ScrollView>
 
-              <View style={{ backgroundColor: 'rgba(250, 250, 250, 1)', justifyContent: 'flex-end', alignItems: 'center', padding: 10, flexDirection: 'row', borderBottomLeftRadius: 5, borderBottomRightRadius: 5 }}>
-                <TouchableOpacity style={{ backgroundColor: '#9896ff', marginRight: 5, width: 60, height: 40, borderRadius: 5, justifyContent: 'center', alignItems: 'center' }} onPress={() => this.cancelSave()} activeOpacity={0.5}>
-                  <Text style={{ textAlign: 'center', color: '#FFFFFF' }}>BATAL</Text>
+              <View style={styles.containerButtonModalReducedAdded}>
+                <TouchableOpacity style={styles.buttonCancelReducedAdded} onPress={() => this.cancelSave()} activeOpacity={0.5}>
+                  <Text style={styles.textButtonRA}>BATAL</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={{ backgroundColor: '#9896ff', width: 60, height: 40, borderRadius: 5, justifyContent: 'center', alignItems: 'center' }} onPress={() => this.saveTransaction()} activeOpacity={0.5}>
-                  {editTransaction == true ?
-                    <Text style={{ textAlign: 'center', color: '#FFFFFF' }}>PERBARUI</Text>
-                    :
-                    <Text style={{ textAlign: 'center', color: '#FFFFFF' }}>SIMPAN</Text>
-                  }
+                <TouchableOpacity style={styles.buttonSaveReducedAdded} onPress={() => this.saveTransaction()} activeOpacity={0.5}>
+                  <Text style={styles.textButtonRA}>SIMPAN</Text>
                 </TouchableOpacity>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         </Modal>
 
         <Modal
@@ -514,51 +423,41 @@ class DetailBalance extends Component {
           onRequestClose={() => {
             this.cancelTransfer()
           }}>
-          <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)', flex: 1, justifyContent: 'flex-end', alignItems: 'center' }}>
-            <View style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT / 3, padding: 10 }}>
-              <View style={{ backgroundColor: 'rgba(250, 250, 250, 1)', paddingTop: 10, paddingHorizontal: 10, borderTopLeftRadius: 5, borderTopRightRadius: 5, flex: 1 }}>
-                <TextInput
-                  style={{ borderBottomWidth: 0.5, color: '#222226', paddingLeft: 0, paddingBottom: 0, fontSize: 14, marginBottom: 10 }}
-                  placeholder={"Total Transfer"}
-                  value={Utils.formatterCurrencyBillion(total_transfer)}
-                  placeholderTextColor={'#7e7e82'}
-                  keyboardType={'number-pad'}
-                  maxLength={13}
-                  onChangeText={(total) => this.changeTotalTransfer(total)}
-                  returnKeyType={'done'}
-                />
-                {errorTotalTransfer == true ?
-                  <Text style={{ color: '#cf2749', paddingVertical: 5, textAlignVertical: 'center', justifyContent: 'center', alignItems: 'center' }}>
-                    Silakan lengkapi kolomnya
+          <TouchableOpacity style={styles.containerModalTF} activeOpacity={1} onPress={() => this.cancelTransfer()}>
+            <View style={styles.bodyModalTF}>
+              <View style={styles.containerInputTF}>
+                <View style={styles.containerTextUser}>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontFamily: 'Bellota-Regular',
+                      flex: 1,
+                      color: name_transfer !== "" ? '#222226' : 'rgba(97, 92, 255, 1)',
+                    }}
+                    onPress={() => this.setState({ errorAccountTransfer: false, id_transfer: "", name_transfer: "", })}
+                  >
+                    {name_transfer !== "" ? name_transfer : "Tekan salah satu akun di bawah ini"}
+                  </Text>
+                  {name_transfer !== "" ?
+                    <Icon
+                      name='times'
+                      size={14}
+                      color='#ff0000'
+                      style={{ paddingHorizontal: 5, }}
+                      onPress={() => this.setState({ errorAccountTransfer: false, id_transfer: "", name_transfer: "", })}
+                    />
+                    : null
+                  }
+                </View>
+                {errorAccountTransfer == true ?
+                  <Text style={styles.textErrorAccountTF}>
+                    Silahkan lengkapi kolomnya
                   </Text>
                   : null
                 }
                 <View
                   style={{
-                    paddingVertical: 5,
-                    borderBottomColor: '#7e7e82',
-                    borderBottomWidth: 0.7,
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      color: name_transfer !== "" ? '#222226' : 'rgba(97, 92, 255, 1)',
-                    }}
-                  >
-                    {name_transfer !== "" ? name_transfer : "Tekan salah satu akun di bawah ini"}
-                  </Text>
-                  {errorAccountTransfer == true ?
-                    <Text style={{ color: '#cf2749', paddingVertical: 5, textAlignVertical: 'center', justifyContent: 'center', alignItems: 'center' }}>
-                      Silakan lengkapi kolomnya
-                  </Text>
-                    : null
-                  }
-                </View>
-                <View
-                  style={{
-                    marginVertical: 10,
-                    borderRadius: 5,
+                    marginVertical: 5,
                   }}
                 >
                   <FlatList
@@ -571,25 +470,14 @@ class DetailBalance extends Component {
                           null
                           :
                           <TouchableOpacity
-                            style={{
-                              marginRight: 5,
-                              paddingVertical: 5,
-                              paddingHorizontal: 10,
-                              marginVertical: 3,
-                              backgroundColor: 'rgba(196, 194, 255, 1)',
-                              borderRadius: 5,
-                              elevation: 1,
-                              shadowColor: 'black',
-                              shadowOffset: { width: 0, height: 0.5 * 5 },
-                              shadowOpacity: 0.3,
-                              shadowRadius: 0.8 * 5,
-                            }}
+                            style={styles.buttonAccount}
                             onPress={() => { this.chooseAccountTransfer(item) }}
                           >
                             <Text
                               style={{
                                 fontSize: 14,
-                                color: '#222226'
+                                color: '#222226',
+                                fontFamily: 'Bellota-Regular',
                               }}
                             >
                               {item.name}
@@ -603,18 +491,35 @@ class DetailBalance extends Component {
                     keyExtractor={(item, index) => `key-${item.id}`}
                   />
                 </View>
+                <TextInput
+                  style={styles.containerInputTotalTF}
+                  placeholder={"Total Transfer"}
+                  value={Utils.formatterCurrencyBillion(total_transfer)}
+                  placeholderTextColor={'#7e7e82'}
+                  keyboardType={'number-pad'}
+                  maxLength={13}
+                  onChangeText={(total) => this.changeTotalTransfer(total)}
+                  returnKeyType={'done'}
+                  onSubmitEditing={() => this.transfer()}
+                />
+                {errorTotalTransfer == true ?
+                  <Text style={styles.textErrorTotalTF}>
+                    Silahkan lengkapi kolomnya
+                  </Text>
+                  : null
+                }
               </View>
 
-              <View style={{ backgroundColor: 'rgba(250, 250, 250, 1)', justifyContent: 'flex-end', alignItems: 'center', padding: 10, flexDirection: 'row', borderBottomLeftRadius: 5, borderBottomRightRadius: 5 }}>
-                <TouchableOpacity style={{ backgroundColor: '#9896ff', marginRight: 5, width: 60, height: 40, borderRadius: 5, justifyContent: 'center', alignItems: 'center' }} onPress={() => this.cancelTransfer()} activeOpacity={0.5}>
-                  <Text style={{ textAlign: 'center', color: '#FFFFFF' }}>BATAL</Text>
+              <View style={styles.containerButtonTC}>
+                <TouchableOpacity style={styles.buttonCancelTC} onPress={() => this.cancelTransfer()} activeOpacity={0.5}>
+                  <Text style={styles.textButtonRA}>BATAL</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={{ backgroundColor: '#9896ff', width: 60, height: 40, borderRadius: 5, justifyContent: 'center', alignItems: 'center' }} onPress={() => this.transfer()} activeOpacity={0.5}>
-                  <Text style={{ textAlign: 'center', color: '#FFFFFF' }}>TRANSFER</Text>
+                <TouchableOpacity style={styles.buttonTransferTC} onPress={() => this.transfer()} activeOpacity={0.5}>
+                  <Text style={styles.textButtonRA}>TRANSFER</Text>
                 </TouchableOpacity>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         </Modal>
 
       </View>
@@ -642,8 +547,298 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#FFFFFF',
     flex: 1,
-    // justifyContent: 'center',
-    // alignItems: 'center',
     paddingTop: Platform.OS == 'ios' ? 20 : 0,
+  },
+  containerHeader: {
+    backgroundColor: '#9896ff',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    elevation: 5,
+    shadowColor: 'black',
+    shadowOffset: { width: 0, height: 0.5 * 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 0.8 * 5,
+  },
+  containerLeftHeader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    padding: 5,
+  },
+  buttonBack: {
+    marginLeft: 5,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 5,
+  },
+  containerCenterHeader: {
+    flex: 1.5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textContainerCenterHeader: {
+    fontSize: 18,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    marginHorizontal: 5,
+    fontFamily: 'Bellota-Bold',
+  },
+  containerRightHeader: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    flexDirection: 'row',
+    padding: 5,
+  },
+  buttonGetAllBalance: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+  },
+  buttonDeleteAllTransaction: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    marginHorizontal: 5,
+  },
+  containerModal: {
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center'
+  },
+  containerInput: {
+    backgroundColor: '#FFFFFF',
+    paddingTop: 10,
+    flex: 1,
+    paddingHorizontal: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20
+  },
+  containerInputTotal: {
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#808080',
+    color: '#222226',
+    paddingLeft: 0,
+    paddingVertical: 5,
+    fontSize: 14,
+    fontFamily: 'Bellota-Regular',
+  },
+  textErrorTotal: {
+    color: '#cf2749',
+    textAlignVertical: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: 12,
+  },
+  containerInputNote: {
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#808080',
+    color: '#222226',
+    paddingLeft: 0,
+    paddingVertical: 5,
+    fontSize: 14,
+    fontFamily: 'Bellota-Regular',
+  },
+  containerButtonModalReducedAdded: {
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    padding: 10,
+    flexDirection: 'row',
+  },
+  buttonCancelReducedAdded: {
+    backgroundColor: '#9896ff',
+    marginRight: 5,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  textButtonRA: {
+    textAlign: 'center',
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontFamily: 'Bellota-Regular',
+  },
+  buttonSaveReducedAdded: {
+    backgroundColor: '#9896ff',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  containerModalTF: {
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center'
+  },
+  bodyModalTF: {
+    width: SCREEN_WIDTH,
+    height: SCREEN_HEIGHT / 2.5,
+  },
+  containerInputTF: {
+    backgroundColor: '#FFFFFF',
+    paddingTop: 10,
+    paddingHorizontal: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    flex: 1,
+  },
+  containerInputTotalTF: {
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#808080',
+    color: '#222226',
+    paddingLeft: 0,
+    paddingVertical: 0,
+    fontSize: 14,
+    fontFamily: 'Bellota-Regular',
+  },
+  textErrorTotalTF: {
+    color: '#cf2749',
+    paddingVertical: 5,
+    textAlignVertical: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: 12,
+  },
+  containerTextUser: {
+    paddingVertical: 5,
+    borderBottomColor: '#808080',
+    borderBottomWidth: 0.5,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  textErrorAccountTF: {
+    color: '#cf2749',
+    textAlignVertical: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: 12,
+  },
+  buttonAccount: {
+    marginRight: 5,
+    paddingVertical: 8,
+    paddingHorizontal: 13,
+    marginVertical: 5,
+    backgroundColor: 'rgba(196, 194, 255, 1)',
+    borderRadius: 5,
+    elevation: 1,
+    shadowColor: 'black',
+    shadowOffset: { width: 0, height: 0.5 * 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 0.8 * 5,
+  },
+  containerButtonTC: {
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    padding: 10,
+    flexDirection: 'row',
+  },
+  buttonCancelTC: {
+    backgroundColor: '#9896ff',
+    marginRight: 5,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonTransferTC: {
+    backgroundColor: '#9896ff',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  containerNoData: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF'
+  },
+  textNoData: {
+    fontSize: 18,
+    color: '#f31616',
+    fontFamily: 'Bellota-Regular',
+  },
+  containerListTransaction: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 5,
+    marginHorizontal: 20,
+    elevation: 5,
+    shadowColor: 'black',
+    shadowOffset: { width: 0, height: 0.5 * 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 0.8 * 5,
+  },
+  containerFooter: {
+    flex: 8,
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+    paddingTop: 15,
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderColor: '#cfcfcf',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  containerLeftFooter: {
+    flex: 1.5,
+    justifyContent: 'center',
+  },
+  textTotalBalance: {
+    flex: 1,
+    textAlignVertical: 'center',
+    fontSize: 18,
+    color: '#76ad78',
+    fontFamily: 'Bellota-Regular',
+  },
+  textBalance: {
+    flex: 1,
+    textAlignVertical: 'center',
+    fontSize: 16,
+    fontFamily: 'Bellota-Regular',
+  },
+  containerRightFooter: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  containerButtonTF: {
+    backgroundColor: '#9896ff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+    padding: 15
+  },
+  containerButtonMinus: {
+    backgroundColor: '#9896ff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+    marginHorizontal: 5,
+    padding: 15
+  },
+  containerButtonPlus: {
+    backgroundColor: '#9896ff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+    padding: 15
   },
 })

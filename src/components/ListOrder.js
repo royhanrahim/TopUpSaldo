@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, View, StyleSheet, ActivityIndicator, Dimensions, Platform, TouchableOpacity, FlatList, RefreshControl, ScrollView, TextInput, Alert, Modal } from 'react-native'
+import { Text, View, StyleSheet, ActivityIndicator, Dimensions, Platform, TouchableOpacity, FlatList, RefreshControl, ScrollView, TextInput, Alert, Modal, } from 'react-native'
 import { Fab, Button, Toast } from 'native-base'
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import DatePicker from 'react-native-datepicker'
@@ -35,7 +35,6 @@ class ListOrder extends Component {
       id_user: '',
       name_user: '',
       errorFood: false,
-      errorPrice: false,
       errorUser: false,
       editOrder: false,
       modalOrder: false,
@@ -69,13 +68,13 @@ class ListOrder extends Component {
         })
       }
     } else {
-      if (food == "") {
-        this.setState({
-          errorFood: true
-        })
-      } else if (id_user == "") {
+      if (id_user == "") {
         this.setState({
           errorUser: true
+        })
+      } else if (food == "") {
+        this.setState({
+          errorFood: true
         })
       } else {
         this.props.addListOrder(id_user, food, price)
@@ -93,7 +92,6 @@ class ListOrder extends Component {
   removeEntry = () => {
     this.setState({
       errorFood: false,
-      errorPrice: false,
       errorUser: false,
       id_user: "",
       name_user: "",
@@ -198,7 +196,6 @@ class ListOrder extends Component {
   editListOrder = (user, value) => {
     this.setState({
       errorFood: false,
-      errorPrice: false,
       id_user: user.id,
       name_user: user.name,
       food: value.food,
@@ -242,7 +239,6 @@ class ListOrder extends Component {
     let amount = text.split(".").join('')
 
     this.setState({
-      errorPrice: false,
       price: amount
     })
   }
@@ -255,105 +251,91 @@ class ListOrder extends Component {
     }
   }
 
-  renderOrder = (item, index) => {
-    const { food, price, id_user, errorFood, errorPrice } = this.state
+  renderOrder = (item, index, first, last) => {
+    const { food, price, id_user, errorFood } = this.state
 
     return (
-      item.order.food && String(item.order.price) ?
-        <View
-          key={item.id}
-          style={{
-            backgroundColor: 'rgba(250, 250, 250, 1)',
-            paddingHorizontal: 10,
-            paddingVertical: 5,
-            marginHorizontal: 10,
-            marginVertical: 5,
-            borderRadius: 5,
-            elevation: 5,
-            shadowColor: 'black',
-            shadowOffset: { width: 0, height: 0.5 * 5 },
-            shadowOpacity: 0.3,
-            shadowRadius: 0.8 * 5
-          }}
-          disabled={item.order.food && String(item.order.price) && true}
-          activeOpacity={0.5}
-        >
-          <View style={{ flex: 1, marginBottom: 5, paddingVertical: 3, borderBottomWidth: 1, borderBottomColor: '#000000', flexDirection: 'row', alignItems: 'center' }}>
-            <Text style={{ fontSize: 18, color: '#222226', flex: 1, }}>{item.name}</Text>
-            <Text style={{ fontSize: 18, color: '#222226', flex: 1, textAlignVertical: 'center', textAlign: 'right', }}>Rp. {Utils.currencyCommas(String(item.order.price ? item.order.price : 0))}</Text>
-          </View>
+      item.order.food && String(item.order.price) &&
+      <View
+        key={item.id}
+        style={[styles.containerListOrder, { marginTop: first == item.id ? 20 : 10, marginBottom: last == item.id ? 20 : 5 }]}
+        disabled={item.order.food && String(item.order.price) && true}
+        activeOpacity={0.5}
+      >
+        <View style={styles.bodyListOrder}>
+          <Text style={styles.textNameListOrder}>{item.name}</Text>
+          <Text style={styles.textTotalListOrder}>Rp. {Utils.currencyCommas(String(item.order.price ? item.order.price : 0))}</Text>
+        </View>
 
-          <View style={{ flex: 1, paddingVertical: 3, marginBottom: 5, flexDirection: 'row', }}>
-            <TouchableOpacity style={{ flex: item.order.food && String(item.order.price) ? 0.8 : 1, alignItems: 'center', flexDirection: 'row' }} activeOpacity={0.7} onPress={() => this.changeSquare(item.id, item.order.order_complete)}>
-              <Icon
-                name={item.order.order_complete == true ? 'check-square' : 'square'}
-                size={22}
-                color='#9896ff'
-              />
+        <View style={styles.footerListOrder}>
+          <TouchableOpacity style={styles.buttonCheck} activeOpacity={0.7} onPress={() => this.changeSquare(item.id, item.order.order_complete)}>
+            <Icon
+              name={item.order.order_complete == true ? 'check-square' : 'square'}
+              size={20}
+              color='#9896ff'
+            />
 
-              <Text style={{ paddingVertical: 3, fontSize: 14, color: '#222226', marginLeft: 5, }}>
-                {item.order.food ? item.order.food : "-"}
-              </Text>
+            <Text style={styles.textOrder}>
+              {item.order.food ? item.order.food : "-"}
+            </Text>
 
-            </TouchableOpacity>
+          </TouchableOpacity>
 
-            <View style={{ flex: 0.2, justifyContent: 'center', alignItems: 'center', }}>
-              <View style={{ flexDirection: 'row', marginBottom: 5, }}>
-                <TouchableOpacity style={{ justifyContent: 'center', alignItems: 'center', paddingVertical: 5, backgroundColor: '#9896ff', paddingHorizontal: 5, marginRight: 3, borderRadius: 3 }} activeOpacity={0.5} onPress={() => this.editListOrder(item, item.order)}>
-                  <Icon
-                    name='pen-square'
-                    size={22}
-                    color='#FFFFFF'
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity style={{ justifyContent: 'center', alignItems: 'center', paddingVertical: 5, backgroundColor: '#9896ff', paddingHorizontal: 5, borderRadius: 3 }} activeOpacity={0.5} onPress={() => this.removeListOrder(item.id)}>
-                  <Icon
-                    name='trash-alt'
-                    size={22}
-                    color='#FFFFFF'
-                  />
-                </TouchableOpacity>
-              </View>
+          <View style={styles.containerButtonEditDeleteArchive}>
+            <View style={{ flexDirection: 'row', marginBottom: 5, }}>
+              <TouchableOpacity style={styles.buttonEdit} activeOpacity={0.5} onPress={() => this.editListOrder(item, item.order)}>
+                <Icon
+                  name='pen-square'
+                  size={20}
+                  color='#FFFFFF'
+                />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.buttonDelete} activeOpacity={0.5} onPress={() => this.removeListOrder(item.id)}>
+                <Icon
+                  name='trash-alt'
+                  size={20}
+                  color='#FFFFFF'
+                />
+              </TouchableOpacity>
+            </View>
 
-              <View style={{}}>
-                <TouchableOpacity style={{ justifyContent: 'center', alignItems: 'center', paddingVertical: 5, backgroundColor: '#9896ff', paddingHorizontal: 18, borderRadius: 3 }} activeOpacity={0.5} onPress={() => this.saveToTransaction(item)}>
-                  <Icon
-                    name='cloud-upload-alt'
-                    size={22}
-                    color='#FFFFFF'
-                  />
-                </TouchableOpacity>
-              </View>
+            <View>
+              <TouchableOpacity style={styles.buttonArchive} activeOpacity={0.5} onPress={() => this.saveToTransaction(item)}>
+                <Icon
+                  name='archive'
+                  size={20}
+                  color='#FFFFFF'
+                />
+              </TouchableOpacity>
             </View>
           </View>
         </View>
-        : null
+      </View>
     )
   }
 
   render() {
     let { users } = this.props
     let params = this.props.navigation.state.params
-    const { food, price, errorFood, errorPrice, errorUser, modalOrder, id_user, name_user, editOrder } = this.state
+    let firstIndex = ""
+    let lastIndex = ""
+    const { food, price, errorFood, errorUser, modalOrder, id_user, name_user, editOrder } = this.state
+
+    if (users.users[0]) {
+      firstIndex = users.users[0].id
+    }
+    if (users.users[users.users.length - 1]) {
+      lastIndex = users.users[users.users.length - 1].id
+    }
 
     return (
       <View style={styles.container}>
         <View style={{ flex: 1 }}>
           <View
-            style={{
-              backgroundColor: '#9896ff',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              height: 60,
-              elevation: 5,
-              shadowColor: 'black',
-              shadowOffset: { width: 0, height: 0.5 * 5 },
-              shadowOpacity: 0.3,
-              shadowRadius: 0.8 * 5
-            }}
+            style={styles.containerHeader}
           >
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-start', }}>
-              <TouchableOpacity style={{ marginLeft: 10, paddingHorizontal: 15, paddingVertical: 10, borderRadius: 5, }} onPress={() => this.goBack()}>
+            <View style={styles.containerLeftHeader}>
+              <TouchableOpacity style={styles.buttonBack} onPress={() => this.goBack()}>
                 <Icon
                   name='chevron-left'
                   size={18}
@@ -361,18 +343,12 @@ class ListOrder extends Component {
                 />
               </TouchableOpacity>
             </View>
-            <View style={{ flex: 1.5, justifyContent: 'center', alignItems: 'center', }}>
-              <Text style={{ fontSize: 18, color: '#FFFFFF', textAlign: 'center', marginHorizontal: 5 }} numberOfLines={2}>DAFTAR PESANAN</Text>
+            <View style={styles.containerCenterHeader}>
+              <Text style={styles.textCenterHeader} numberOfLines={2}>DAFTAR PESANAN</Text>
             </View>
-            <View style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center', flexDirection: 'row' }}>
+            <View style={styles.containerRightHeader}>
               <TouchableOpacity
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: 5,
-                  paddingHorizontal: 15,
-                  paddingVertical: 10,
-                }}
+                style={styles.buttonSaveAll}
                 onPress={() => this.saveAllOrder()}
               >
                 <Icon
@@ -382,15 +358,7 @@ class ListOrder extends Component {
                 />
               </TouchableOpacity>
               <TouchableOpacity
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: 5,
-                  paddingHorizontal: 15,
-                  paddingVertical: 10,
-                  marginRight: 10,
-                  marginLeft: 5,
-                }}
+                style={styles.buttonDeleteAll}
                 onPress={() => this.deleteAllOrder()}
               >
                 <Icon
@@ -404,15 +372,15 @@ class ListOrder extends Component {
 
           <View style={{ backgroundColor: '#FFFFFF', flex: 1 }}>
             {users.users.length == 0 ?
-              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFFFFF' }}>
-                <Text style={{ fontSize: 22, color: '#222226' }}>Tidak ada data</Text>
+              <View style={styles.containerNoData}>
+                <Text style={styles.textNoData}>Tidak ada data</Text>
               </View>
               :
               <FlatList
                 contentContainerStyle={{ paddingVertical: 5 }}
                 data={users.users}
                 keyExtractor={(item, index) => item.id}
-                renderItem={({ item, index }) => this.renderOrder(item, index)}
+                renderItem={({ item, index }) => this.renderOrder(item, index, firstIndex, lastIndex)}
                 refreshControl={
                   <RefreshControl
                     refreshing={users.refreshList}
@@ -427,7 +395,7 @@ class ListOrder extends Component {
           <TouchableOpacity
             activeOpacity={0.5}
             onPress={() => this.setState({ modalOrder: true })}
-            style={{ backgroundColor: '#9896ff', paddingHorizontal: 20, paddingVertical: 15, justifyContent: 'center', alignItems: 'center', marginHorizontal: 10, marginVertical: 5, }}
+            style={styles.buttonAddOrder}
           >
             <Icon
               name='plus'
@@ -445,142 +413,118 @@ class ListOrder extends Component {
             this.removeEntry()
           }}
         >
-          <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)', justifyContent: 'flex-end', paddingHorizontal: 10, paddingBottom: 10 }}
+          <TouchableOpacity
+            style={styles.containerModal}
+            onPress={() => this.removeEntry()}
+            activeOpacity={1}
           >
-            <View style={{ backgroundColor: 'rgba(250, 250, 250, 1)', borderRadius: 5, }}>
-              <TextInput
-                placeholder="Pesanan"
-                value={food}
-                onChangeText={(text) => this.changeFood(text)}
-                keyboardType="default"
-                multiline={true}
-                style={{
-                  borderBottomWidth: 1,
-                  color: '#222226',
-                  fontSize: 14,
-                  marginHorizontal: 10,
-                  paddingLeft: 0,
-                  paddingBottom: 5,
-                  borderBottomColor: '#7e7e82',
-                }}
-              />
-              {errorFood == true &&
-                <Text style={{ marginBottom: 5, fontSize: 12, marginHorizontal: 10, color: '#cf2749' }}>Pesanan harus di isi</Text>
-              }
-              <TextInput
-                style={{
-                  borderBottomWidth: 1,
-                  color: '#222226',
-                  fontSize: 14,
-                  marginHorizontal: 10,
-                  paddingLeft: 0,
-                  paddingBottom: 10,
-                  borderBottomColor: '#7e7e82',
-                }}
-                placeholder="Harga"
-                value={Utils.formatterCurrencyBillion(String(price))}
-                onChangeText={(text) => this.changePrice(text)}
-                keyboardType="number-pad"
-                maxLength={13}
-                returnKeyType="done"
-                onSubmitEditing={() => this.addListOrder()}
-              />
-              {errorPrice == true &&
-                <Text style={{ marginBottom: 5, fontSize: 12, marginHorizontal: 10, color: '#cf2749' }}>Harga harus di isi</Text>
-              }
-              {editOrder == false ?
-                <View>
-                  <View
-                    style={{
-                      marginHorizontal: 10,
-                      paddingVertical: 10,
-                      borderBottomColor: '#7e7e82',
-                      borderBottomWidth: 1,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        color: name_user !== "" ? '#222226' : 'rgba(97, 92, 255, 1)',
-                        flex: 1,
-                      }}
-                      onPress={() => this.setState({ errorUser: false, id_user: "", name_user: "", })}
-                    >
-                      {name_user !== "" ? name_user : "Tekan salah satu pengguna di bawah ini"}
-                    </Text>
-                    {name_user !== "" ?
-                      <Icon
-                        name='times'
-                        size={14}
-                        color='#222226'
-                        style={{ marginHorizontal: 5, }}
+            <View style={styles.containerModalInput}>
+              <View
+                style={styles.modalInput}
+              >
+                {editOrder == false &&
+                  <View>
+                    <View style={styles.containerModalInputUser}>
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          color: name_user !== "" ? '#222226' : '#615cff',
+                          flex: 1,
+                          paddingVertical: 5,
+                          fontFamily: 'Bellota-Regular'
+                        }}
                         onPress={() => this.setState({ errorUser: false, id_user: "", name_user: "", })}
-                      />
-                      : null
-                    }
-                  </View>
-                  {errorUser == true &&
-                    <Text style={{ color: '#cf2749', paddingHorizontal: 10, paddingVertical: 5, textAlignVertical: 'center', justifyContent: 'center', alignItems: 'center' }}>
-                      Nama pengguna tidak boleh kosong
-                    </Text>
-                  }
-                  <FlatList
-                    style={{ marginHorizontal: 10 }}
-                    data={users.users}
-                    horizontal={true}
-                    showsHorizontalScrollIndicator={false}
-                    indicatorStyle="white"
-                    renderItem={({ item, index }) =>
-                      item.length !== 0 ?
-                        item.order.food && String(item.order.price) ?
-                          null
-                          :
-                          <TouchableOpacity
-                            style={{
-                              paddingVertical: 5,
-                              paddingHorizontal: 10,
-                              marginTop: 10,
-                              marginRight: 5,
-                              backgroundColor: 'rgba(196, 194, 255, 1)',
-                              borderRadius: 5,
-                              elevation: 1,
-                              shadowColor: 'black',
-                              shadowOffset: { width: 0, height: 0.5 * 5 },
-                              shadowOpacity: 0.3,
-                              shadowRadius: 0.8 * 5,
-                            }}
-                            onPress={() => { this.setState({ id_user: item.id, name_user: item.name, errorUser: false }) }}
-                            activeOpacity={0.5}
-                          >
-                            <Text
-                              style={{
-                                fontSize: 14,
-                                color: '#222226'
-                              }}
-                            >
-                              {item.name}
-                            </Text>
-                          </TouchableOpacity>
+                      >
+                        {name_user !== "" ? name_user : "Tekan salah satu pengguna di bawah ini"}
+                      </Text>
+                      {name_user !== "" ?
+                        <Icon
+                          name='times'
+                          size={14}
+                          color='#ff0000'
+                          style={{ marginHorizontal: 5, }}
+                          onPress={() => this.setState({ errorUser: false, id_user: "", name_user: "", })}
+                        />
                         : null
+                      }
+                    </View>
+                    {errorUser == true &&
+                      <Text style={styles.textErrorUser}>
+                        Nama pengguna tidak boleh kosong
+                    </Text>
                     }
-                    keyExtractor={(item, index) => `key-${item.id}`}
-                  />
-                </View>
-                : null
-              }
+                    <FlatList
+                      data={users.users}
+                      horizontal={true}
+                      showsHorizontalScrollIndicator={false}
+                      indicatorStyle="white"
+                      renderItem={({ item, index }) =>
+                        item.length !== 0 ?
+                          item.order.food && String(item.order.price) ?
+                            null
+                            :
+                            <TouchableOpacity
+                              style={[styles.buttonUser, { marginRight: lastIndex == item.id ? 0 : 5 }]}
+                              onPress={() => { this.setState({ id_user: item.id, name_user: item.name, errorUser: false }) }}
+                              activeOpacity={0.5}
+                            >
+                              <Text
+                                style={{
+                                  fontSize: 14,
+                                  color: '#222226',
+                                  fontFamily: 'Bellota-Regular'
+                                }}
+                              >
+                                {item.name}
+                              </Text>
+                            </TouchableOpacity>
+                          : null
+                      }
+                      keyExtractor={(item, index) => `key-${item.id}`}
+                    />
+                  </View>
+                }
+                {editOrder == true &&
+                  <View style={styles.containerStatusName}>
+                    <Text style={styles.textOrderStatus}>Pemesan :</Text>
+                    <Text style={styles.textNameStatus}>{name_user}</Text>
+                  </View>
+                }
+                <TextInput
+                  placeholder="Pesanan"
+                  placeholderTextColor={'#7e7e82'}
+                  value={food}
+                  onChangeText={(text) => this.changeFood(text)}
+                  keyboardType="default"
+                  multiline={true}
+                  style={styles.inputOrder}
+                />
+                {errorFood == true &&
+                  <Text style={styles.textErrorOrder}>Pesanan harus di isi</Text>
+                }
+                <TextInput
+                  style={styles.inputPrice}
+                  placeholder="Harga"
+                  placeholderTextColor={'#7e7e82'}
+                  value={Utils.formatterCurrencyBillion(String(price))}
+                  onChangeText={(text) => this.changePrice(text)}
+                  keyboardType="number-pad"
+                  maxLength={13}
+                  returnKeyType="done"
+                  onSubmitEditing={() => this.addListOrder()}
+                />
+              </View>
 
-              <View style={{ justifyContent: 'flex-end', alignItems: 'center', padding: 10, flexDirection: 'row', borderBottomLeftRadius: 5, borderBottomRightRadius: 5 }}>
-                <TouchableOpacity style={{ backgroundColor: '#9896ff', marginRight: 5, width: 60, height: 40, borderRadius: 5, justifyContent: 'center', alignItems: 'center' }} onPress={() => this.removeEntry()} activeOpacity={0.5}>
-                  <Text style={{ textAlign: 'center', color: '#FFFFFF' }}>BATAL</Text>
+              <View style={styles.containerButtonOrder}>
+                <TouchableOpacity style={styles.buttonCancel} onPress={() => this.removeEntry()} activeOpacity={0.5}>
+                  <Text style={styles.textButtonCancelSave}>BATAL</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={{ backgroundColor: '#9896ff', width: 60, height: 40, borderRadius: 5, justifyContent: 'center', alignItems: 'center' }} onPress={() => this.addListOrder()} activeOpacity={0.5}>
-                  <Text style={{ textAlign: 'center', color: '#FFFFFF' }}>SIMPAN</Text>
+                <TouchableOpacity style={styles.buttonSave} onPress={() => this.addListOrder()} activeOpacity={0.5}>
+                  <Text style={styles.textButtonCancelSave}>SIMPAN</Text>
                 </TouchableOpacity>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         </Modal>
 
         <ModalLoading
@@ -613,8 +557,287 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#FFFFFF',
     flex: 1,
-    // justifyContent: 'center',
-    // alignItems: 'center',
     paddingTop: Platform.OS == 'ios' ? 20 : 0,
   },
+  containerHeader: {
+    backgroundColor: '#9896ff',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    height: 60,
+    elevation: 5,
+    shadowColor: 'black',
+    shadowOffset: { width: 0, height: 0.5 * 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 0.8 * 5
+  },
+  containerLeftHeader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    padding: 5,
+  },
+  buttonBack: {
+    marginLeft: 5,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 5,
+  },
+  containerCenterHeader: {
+    flex: 1.5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textCenterHeader: {
+    fontSize: 18,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    marginHorizontal: 5,
+    fontFamily: 'Bellota-Bold',
+  },
+  containerRightHeader: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    flexDirection: 'row',
+    padding: 5,
+  },
+  buttonSaveAll: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+  },
+  buttonDeleteAll: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    marginHorizontal: 5,
+  },
+  containerNoData: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF'
+  },
+  textNoData: {
+    fontSize: 18,
+    color: '#222226',
+    fontFamily: 'Bellota-Regular'
+  },
+  buttonAddOrder: {
+    backgroundColor: '#9896ff',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  containerModal: {
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center'
+  },
+  containerModalInput: {
+    backgroundColor: '#fafafa',
+    borderTopRightRadius: 20,
+    borderTopLeftRadius: 20,
+    width: SCREEN_WIDTH,
+    height: SCREEN_HEIGHT / 2.5
+  },
+  modalInput: {
+    backgroundColor: '#FFFFFF',
+    paddingTop: 10,
+    flex: 1,
+    paddingHorizontal: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20
+  },
+  inputOrder: {
+    borderBottomWidth: 0.5,
+    color: '#222226',
+    fontSize: 14,
+    paddingLeft: 0,
+    paddingVertical: 3,
+    borderBottomColor: '#808080',
+    textAlignVertical: 'center',
+    fontFamily: 'Bellota-Regular'
+  },
+  textErrorOrder: {
+    fontSize: 12,
+    color: '#cf2749',
+    fontFamily: 'Bellota-Regular'
+  },
+  inputPrice: {
+    borderBottomWidth: 0.5,
+    color: '#222226',
+    fontSize: 14,
+    paddingLeft: 0,
+    paddingVertical: 3,
+    borderBottomColor: '#808080',
+    textAlignVertical: 'center',
+    fontFamily: 'Bellota-Regular'
+  },
+  containerModalInputUser: {
+    borderBottomColor: '#808080',
+    borderBottomWidth: 0.5,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  textErrorUser: {
+    color: '#cf2749',
+    paddingBottom: 5,
+    textAlignVertical: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: 12,
+    fontFamily: 'Bellota-Regular'
+  },
+  buttonUser: {
+    paddingVertical: 8,
+    paddingHorizontal: 13,
+    marginVertical: 10,
+    backgroundColor: '#c4c2ff',
+    borderRadius: 5,
+    elevation: 1,
+    shadowColor: 'black',
+    shadowOffset: { width: 0, height: 0.5 * 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 0.8 * 5,
+  },
+  containerButtonOrder: {
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    padding: 10,
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+  },
+  buttonCancel: {
+    backgroundColor: '#9896ff',
+    marginRight: 5,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  textButtonCancelSave: {
+    textAlign: 'center',
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontFamily: 'Bellota-Regular'
+  },
+  buttonSave: {
+    backgroundColor: '#9896ff',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  containerStatusName: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginBottom: 5,
+  },
+  textOrderStatus: {
+    flex: 0.5,
+    fontSize: 18,
+    textAlignVertical: 'center',
+    color: '#b8adff',
+    fontFamily: 'Bellota-Bold'
+  },
+  textNameStatus: {
+    flex: 1,
+    fontSize: 18,
+    textAlignVertical: 'center',
+    textAlign: 'right',
+    color: '#b8adff',
+    fontFamily: 'Bellota-Bold'
+  },
+  containerListOrder: {
+    backgroundColor: '#fafafa',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginHorizontal: 20,
+    borderRadius: 5,
+    elevation: 5,
+    shadowColor: 'black',
+    shadowOffset: { width: 0, height: 0.5 * 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 0.8 * 5
+  },
+  bodyListOrder: {
+    flex: 1,
+    marginBottom: 5,
+    paddingVertical: 3,
+    borderBottomWidth: 1,
+    borderBottomColor: '#000000',
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  textNameListOrder: {
+    fontSize: 18,
+    color: '#222226',
+    flex: 1,
+    fontFamily: 'Bellota-Bold'
+  },
+  textTotalListOrder: {
+    fontSize: 18,
+    color: '#222226',
+    flex: 1,
+    textAlignVertical: 'center',
+    textAlign: 'right',
+    fontFamily: 'Bellota-Bold'
+  },
+  footerListOrder: {
+    flex: 1,
+    paddingVertical: 3,
+    marginBottom: 5,
+    flexDirection: 'row',
+  },
+  buttonCheck: {
+    flex: 0.8,
+    alignItems: 'center',
+    flexDirection: 'row'
+  },
+  textOrder: {
+    paddingVertical: 3,
+    fontSize: 14,
+    color: '#222226',
+    marginLeft: 5,
+    fontFamily: 'Bellota-Regular'
+  },
+  containerButtonEditDeleteArchive: {
+    flex: 0.2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonEdit: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 5,
+    backgroundColor: '#9896ff',
+    paddingHorizontal: 5,
+    marginRight: 3,
+    borderRadius: 3
+  },
+  buttonDelete: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 5,
+    backgroundColor: '#9896ff',
+    paddingHorizontal: 5,
+    borderRadius: 3
+  },
+  buttonArchive: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 5,
+    backgroundColor: '#9896ff',
+    paddingHorizontal: 18,
+    borderRadius: 3
+  }
 })

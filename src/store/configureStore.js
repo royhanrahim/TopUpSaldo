@@ -1,4 +1,5 @@
-import { AsyncStorage } from 'react-native'
+// import { AsyncStorage } from 'react-native'
+import AsyncStorage from '@react-native-community/async-storage';
 import { createStore, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 import { persistReducer, persistStore } from 'redux-persist'
@@ -9,6 +10,7 @@ import rootReducer from '../reducers'
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
+  timeout: 0,
   // whitelist: [],
 }
 

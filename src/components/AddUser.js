@@ -13,8 +13,6 @@ import Utils from '../components/Utils';
 
 var moment = require('moment');
 
-const formatter = new Intl.NumberFormat('id', { useGrouping: true })
-
 let SCREEN_WIDTH = Dimensions.get('window').width
 let SCREEN_HEIGHT = Dimensions.get('window').height
 let DATE = new Date()
@@ -49,8 +47,10 @@ class AddUser extends Component {
     var UUID = [];
 
     if (params) {
-      if (name == "" || balance == "") {
-        Alert.alert("Warning", "Silakan lengkapi kolomnya")
+      if (name == "") {
+        this.setState({
+          errorName: "Nama tidak boleh kosong"
+        })
       } else {
         this.props.updateUser(params.data.id, name, params.data.balance, date, params.data.transaction, params.data.order)
         this.props.navigation.goBack()
@@ -96,20 +96,10 @@ class AddUser extends Component {
       <View style={styles.container}>
         <View style={{ flex: 1 }}>
           <View
-            style={{
-              backgroundColor: '#9896ff',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              height: 60,
-              elevation: 5,
-              shadowColor: 'black',
-              shadowOffset: { width: 0, height: 0.5 * 5 },
-              shadowOpacity: 0.3,
-              shadowRadius: 0.8 * 5
-            }}
+            style={styles.containerHeader}
           >
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-start' }}>
-              <TouchableOpacity style={{ marginLeft: 15, paddingHorizontal: 15, paddingVertical: 10, borderRadius: 5 }} onPress={() => this.goBack()}>
+            <View style={styles.containerLeftHeader}>
+              <TouchableOpacity style={styles.buttonLeftHeader} onPress={() => this.goBack()}>
                 <Icon
                   name='chevron-left'
                   size={18}
@@ -117,16 +107,16 @@ class AddUser extends Component {
                 />
               </TouchableOpacity>
             </View>
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-              <Text style={{ fontSize: 18, color: '#FFFFFF', textAlign: 'center' }}>{params ? "UBAH" : "TAMBAH"} PENGGUNA</Text>
+            <View style={styles.containerCenterHeader}>
+              <Text style={styles.textCenterHeader}>{params ? "UBAH" : "TAMBAH"} PENGGUNA</Text>
             </View>
-            <View style={{ flex: 1 }} />
+            <View style={{ flex: 0.5 }} />
           </View>
 
-          <ScrollView style={{ backgroundColor: '#FFFFFF', paddingHorizontal: 20, paddingVertical: 10, height: SCREEN_HEIGHT }}>
+          <ScrollView style={styles.containerBody}>
             <TextInput
               ref={(name) => { this.name = name }}
-              style={{ borderBottomWidth: 0.5, fontSize: 14, color: '#222226', paddingLeft: 0, paddingBottom: 0 }}
+              style={styles.containerInputForm}
               value={name}
               placeholder={"Nama"}
               placeholderTextColor={"#c5c5d1"}
@@ -136,55 +126,66 @@ class AddUser extends Component {
               autoFocus={true}
             />
             {errorName !== "" ?
-              <Text style={{ color: '#cf2749', paddingVertical: 5, textAlignVertical: 'center', justifyContent: 'center', alignItems: 'center' }}>
+              <Text style={styles.textErrorName}>
                 {errorName}
               </Text>
               : null
             }
             {params ?
               null :
-              <TextInput
-                ref={(balance) => { this.balance = balance }}
-                style={{ borderBottomWidth: 0.5, fontSize: 14, color: '#222226', paddingLeft: 0, paddingBottom: 0 }}
-                value={Utils.formatterCurrencyBillion(balance)}
-                defaultValue={balance}
-                placeholder={"Saldo"}
-                placeholderTextColor={"#c5c5d1"}
-                onChangeText={(balance) => this.changeBalance(balance)}
-                keyboardType={"number-pad"}
-                returnKeyType={"done"}
-                maxLength={13}
-                onSubmitEditing={() => this.saveUser()}
-              />
-            }
-            <View style={{ justifyContent: 'center', marginTop: 10 }}>
-              <DatePicker
-                style={{ width: 180, }}
-                date={date}
-                mode="date"
-                placeholder="Select Date"
-                format="DD MMMM YYYY"
-                minDate="1900-01-01"
-                confirmBtnText="Confirm"
-                cancelBtnText="Cancel"
-                customStyles={{
-                  dateInput: {
-                    // backgroundColor: 'skyblue',
-                    borderLeftWidth: 0,
-                    borderRightWidth: 0,
-                    borderTopWidth: 0,
-                    alignItems: 'flex-start'
-                  }
-                  // ... You can check the source to find the other keys.
+              <View
+                style={{
+                  flexDirection: 'row',
+                  marginTop: 10,
                 }}
-                onDateChange={(date) => { this.setState({ date: date }) }}
-              />
-            </View>
+              >
+                <TextInput
+                  ref={(balance) => { this.balance = balance }}
+                  style={styles.containerInputFormBalance}
+                  value={Utils.formatterCurrencyBillion(balance)}
+                  defaultValue={balance}
+                  placeholder={"Saldo"}
+                  placeholderTextColor={"#c5c5d1"}
+                  onChangeText={(balance) => this.changeBalance(balance)}
+                  keyboardType={"number-pad"}
+                  returnKeyType={"done"}
+                  maxLength={13}
+                  onSubmitEditing={() => this.saveUser()}
+                />
+                <View style={styles.containerDate}>
+                  <DatePicker
+                    style={{ borderBottomWidth: 0.5, borderBottomColor: '#808080', width: SCREEN_WIDTH / 2.5, paddingBottom: 5 }}
+                    date={date}
+                    mode="date"
+                    placeholder="Select Date"
+                    format="DD MMMM YYYY"
+                    minDate="1900-01-01"
+                    confirmBtnText="Confirm"
+                    cancelBtnText="Cancel"
+                    customStyles={{
+                      dateInput: {
+                        borderLeftWidth: 0,
+                        borderRightWidth: 0,
+                        borderTopWidth: 0,
+                        borderBottomWidth: 0,
+                        alignItems: 'flex-start',
+                        color: '#222226',
+                      },
+                      dateText: {
+                        fontFamily: 'Bellota-Regular',
+                      },
+                      // ... You can check the source to find the other keys.
+                    }}
+                    onDateChange={(date) => { this.setState({ date: date }) }}
+                  />
+                </View>
+              </View>
+            }
           </ScrollView>
 
-          <View style={{ backgroundColor: '#FFFFFF', paddingHorizontal: 20, paddingVertical: 10, justifyContent: 'flex-end', alignItems: 'flex-end' }}>
-            <TouchableOpacity style={{ width: 120, height: 50, backgroundColor: '#9896ff', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 5 }} activeOpacity={0.5} onPress={() => this.saveUser()}>
-              <Text style={{ fontSize: 18, color: '#FFFFFF' }}>{params ? "PERBARUI" : "SIMPAN"}</Text>
+          <View style={styles.containerButtonSave}>
+            <TouchableOpacity style={styles.buttonSave} activeOpacity={0.5} onPress={() => this.saveUser()}>
+              <Text style={{ fontSize: 18, color: '#FFFFFF', fontFamily: 'Bellota-Bold' }}>{params ? "PERBARUI" : "SIMPAN"}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -209,8 +210,93 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#FFFFFF',
     flex: 1,
-    // justifyContent: 'center',
-    // alignItems: 'center',
     paddingTop: Platform.OS == 'ios' ? 20 : 0,
   },
+  containerHeader: {
+    backgroundColor: '#9896ff',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    elevation: 5,
+    shadowColor: 'black',
+    shadowOffset: { width: 0, height: 0.5 * 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 0.8 * 5,
+  },
+  containerLeftHeader: {
+    flex: 0.5,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    padding: 5,
+  },
+  buttonLeftHeader: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    marginHorizontal: 5,
+  },
+  containerCenterHeader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textCenterHeader: {
+    fontSize: 18,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    fontFamily: 'Bellota-Bold'
+  },
+  containerBody: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    flex: 1,
+  },
+  containerInputForm: {
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#808080',
+    fontSize: 14,
+    color: '#222226',
+    paddingLeft: 0,
+    paddingBottom: 5,
+    fontFamily: 'Bellota-Regular',
+  },
+  textErrorName: {
+    color: '#cf2749',
+    paddingVertical: 5,
+    textAlignVertical: 'center',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  containerInputFormBalance: {
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#808080',
+    fontSize: 14,
+    color: '#222226',
+    paddingLeft: 0,
+    paddingBottom: 5,
+    flex: 1,
+    fontFamily: 'Bellota-Regular',
+  },
+  containerDate: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  containerButtonSave: {
+    backgroundColor: '#FFFFFF',
+    paddingRight: 20,
+    paddingVertical: 20,
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    flex: 0.1,
+  },
+  buttonSave: {
+    backgroundColor: '#9896ff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderRadius: 5
+  }
 })

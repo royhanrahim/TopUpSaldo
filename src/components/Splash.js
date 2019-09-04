@@ -27,7 +27,7 @@ class Splash extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'skyblue',
+    backgroundColor: '#9896ff',
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -36,6 +36,8 @@ const styles = StyleSheet.create({
   textContainer: {
     fontSize: 18,
     marginBottom: 10,
+    color: '#FFFFFF',
+    fontFamily: 'Bellota-Bold',
   }
 })
 
