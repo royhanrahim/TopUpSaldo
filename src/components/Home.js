@@ -173,7 +173,7 @@ class Home extends Component {
               <TouchableOpacity style={styles.containerButtonDelete} activeOpacity={0.5} onPress={() => this.deleteAllData()}>
                 <Icon
                   name='trash'
-                  size={18}
+                  size={16}
                   color='#FFFFFF'
                 />
               </TouchableOpacity>
